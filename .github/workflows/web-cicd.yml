@@ -49,11 +49,13 @@ jobs:
         az acr helm repo add -n ${{ secrets.ACR_NAME }}
     - name: Package Helm chart
       run: |
-        ls -ll Deploy/helm/__charts
-        helm lint Deploy/helm/__charts
         helm package  Deploy/helm/web -d Deploy/helm/__charts --version 1.0.0-${{ github.sha }} 
     - name: Upload chart to ACR
       run: |
+        ls -la Deploy/helm/__charts
+        tar -xvzf Deploy/helm/__charts/web-1.0.0-${{ github.sha }}.tgz
+        ls -la Deploy/helm/__charts
+        helm lint Deploy/helm/__charts
         az acr helm push Deploy/helm/__charts/web-1.0.0-${{ github.sha }}.tgz -n ${{ secrets.ACR_NAME }}
     - name: Generate config file
       shell: pwsh
