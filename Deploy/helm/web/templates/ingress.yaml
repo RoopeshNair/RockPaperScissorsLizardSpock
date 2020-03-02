@@ -3,7 +3,7 @@
 {{- $ingressPath := .Values.inf.ingress.web.path -}}
 {{- $uploaderPath := .Values.inf.ingress.web.uploaderPath -}}
 
-apiVersion: extensions/v1
+apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: {{ $fullName }}
