@@ -52,7 +52,10 @@ jobs:
         helm package  Deploy/helm/web -d Deploy/helm/__charts --version 1.0.0-${{ github.sha }} 
     - name: Upload chart to ACR
       run: |
+        cat Deploy/helm/__charts/web/Chart.yaml
         helm lint Deploy/helm/__charts/web
+        cat Deploy/helm/__charts/web/templates/configmap.yaml
+        helm lint Deploy/helm/__charts/web/templates/configmap.yaml
         az acr helm push Deploy/helm/__charts/web-1.0.0-${{ github.sha }}.tgz -n ${{ secrets.ACR_NAME }}
     - name: Generate config file
       shell: pwsh
