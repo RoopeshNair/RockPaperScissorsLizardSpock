@@ -17,7 +17,7 @@ data:
   Authentication__Twitter__ConsumerKey: {{ .Values.auth.twitter.key }}
   Authentication__Twitter__ConsumerSecret: {{ .Values.auth.twitter.secret }}
 {{- if .Values.inf.web.scale.enabled }}
-{{- if eq .Values.inf.web.scale.dp.provider "internal" -}}
+{{- if eq .Values.inf.web.scale.dp.provider "internal" }}
   DataProtectionProvider: "redis"
   DataProtectionProviderConstr: webdata
 {{ else }}
