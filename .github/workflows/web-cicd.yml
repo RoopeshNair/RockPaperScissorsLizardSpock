@@ -56,7 +56,6 @@ jobs:
         cat web/Chart.yaml
         cat web/templates/configmap.yaml
         cat web/templates/ingress.yaml
-        helm lint web
         az acr helm push Deploy/helm/__charts/web-1.0.0-${{ github.sha }}.tgz -n ${{ secrets.ACR_NAME }}
     - name: Generate config file
       shell: pwsh
