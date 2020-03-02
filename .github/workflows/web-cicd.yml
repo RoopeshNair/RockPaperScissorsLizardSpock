@@ -54,9 +54,11 @@ jobs:
       run: |
         tar -xvzf Deploy/helm/__charts/web-1.0.0-${{ github.sha }}.tgz
         cat web/Chart.yaml
-        helm lint web
+        helm lint web/Chart.yaml
         cat web/templates/configmap.yaml
         helm lint web/templates/configmap.yaml
+        cat web/templates/ingress.yaml
+        helm lint web/templates/ingress.yaml
         az acr helm push Deploy/helm/__charts/web-1.0.0-${{ github.sha }}.tgz -n ${{ secrets.ACR_NAME }}
     - name: Generate config file
       shell: pwsh
