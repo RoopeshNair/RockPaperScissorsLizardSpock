@@ -1,13 +1,13 @@
-# Node Player Workflow
+# Dotnet player workflow
 
-name: NodePlayer
+name: DotnetPlayer
 
 on: 
   push:
     paths:
-    - Source/Services/RPSLS.NodePlayer.Api/**
-    - .github/workflows/node_player_cicd.yml    
-    - Deploy/helm/node-player/**
+      - Source/Services/RPSLS.DotNetPlayer.Api/**
+      - .github/workflows/dotnet_player_cicd.yml
+      - Deploy/helm/dotnet-player/**
     branches:
       - master    
 
@@ -17,21 +17,19 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Build the Docker image
-      working-directory: Source/Services/RPSLS.NodePlayer.Api
-      run: docker build . --file Dockerfile --tag ${{ secrets.ACR_NAME }}.azurecr.io/node.player:gh-${{ github.sha }}
+      working-directory: Source/Services/RPSLS.DotNetPlayer.Api
+      run: docker build . --file Dockerfile --tag ${{ secrets.ACR_NAME }}.azurecr.io/dotnet.player:gh-${{ github.sha }}
     - name: Login to Azure
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-    - name: Set Azure subscription and ACR login
-      uses: azure/CLI@v1
-      with:        
-        inlineScript: |
-          az account set -s ${{ secrets.AZURE_SUBSCRIPTION }}  
-          az acr login -n ${{ secrets.ACR_NAME }} --expose-token
+    - name: Set Azure subscription
+      run: |
+        az account set -s ${{ secrets.AZURE_SUBSCRIPTION }}
     - name: Docker push
-      run: |        
-        docker push ${{ secrets.ACR_NAME }}.azurecr.io/node.player:gh-${{ github.sha }}
+      run: |
+        az acr login -n ${{ secrets.ACR_NAME }}
+        docker push ${{ secrets.ACR_NAME }}.azurecr.io/dotnet.player:gh-${{ github.sha }}
     - name: Set AKS kubectl context
       uses: azure/aks-set-context@v1
       with:
@@ -42,34 +40,24 @@ jobs:
       uses: azure/setup-helm@v1
       with:
         version: latest
-      id: install  
+      id: install        
     - name: Helm repo add
-      uses: azure/CLI@v1
-      with:
-        azcliversion: 2.0.72
-        inlineScript: |
-          az acr helm repo add -n ${{ secrets.ACR_NAME }}           
+      run: |
+        az acr helm repo add -n ${{ secrets.ACR_NAME }}
     - name: Package Helm chart
       run: |
-        helm package  Deploy/helm/node-player -d Deploy/helm/__charts --version 1.0.0-${{ github.sha }}
+        helm package  Deploy/helm/dotnet-player -d Deploy/helm/__charts --version 1.0.0-${{ github.sha }}
     - name: Upload chart to ACR
-      uses: azure/CLI@v1
-      with:
-        azcliversion: 2.0.72
-        inlineScript: |
-          az acr helm push Deploy/helm/__charts/node-player-1.0.0-${{ github.sha }}.tgz -n ${{ secrets.ACR_NAME }}  
-          az extension add --name application-insights
+      run: |
+        az acr helm push Deploy/helm/__charts/dotnet-player-1.0.0-${{ github.sha }}.tgz -n ${{ secrets.ACR_NAME }}
     - name: Generate config file
       shell: pwsh
-      run: |        
+      run: |
+        az extension add --name application-insights
         Deploy/powershell/Generate-Config.ps1 -gvaluesTemplate gvalues.template.gh -resourceGroup ${{ secrets.RESOURCE_GROUP }} -outputFile _values-gh.yaml -aksHost ${{ secrets.AKS_HOST }} -resourceGroupAcr ${{ secrets.RESOURCE_GROUP_ACR }}
     - name: Install Helm Chart
       run: |
         helm repo update
-        helm upgrade --install -f Deploy/powershell/_values-gh.yaml --set image.repository=${{ secrets.ACR_NAME }}.azurecr.io/node.player --set image.tag=gh-${{ github.sha }} --set replicaCount=2  node-player  ${{ secrets.ACR_NAME }}/node-player --version=1.0.0-${{ github.sha }}
+        helm upgrade --install -f Deploy/powershell/_values-gh.yaml --set image.repository=${{ secrets.ACR_NAME }}.azurecr.io/dotnet.player --set image.tag=gh-${{ github.sha }}  --set replicaCount=2  dotnet-player  ${{ secrets.ACR_NAME }}/dotnet-player --version=1.0.0-${{ github.sha }} 
       
-       
-       
-    
-     
-      
+        
