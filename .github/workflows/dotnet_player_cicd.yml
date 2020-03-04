@@ -36,11 +36,16 @@ jobs:
         creds: '${{ secrets.AZURE_CREDENTIALS }}'
         cluster-name: ${{ secrets.CLUSTER_NAME }}
         resource-group: ${{ secrets.RESOURCE_GROUP }}        
-    - name: Init Helm
+    - name: Set up Helm
+      uses: azure/setup-helm@v1
+      with:
+        version: latest
+      id: install        
+    - name: Helm repo add
       run: |
-        curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 > get_helm.sh
-        chmod 700 get_helm.sh
-        ./get_helm.sh
+        #curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 > get_helm.sh
+        #chmod 700 get_helm.sh
+        #./get_helm.sh
         az acr helm repo add -n ${{ secrets.ACR_NAME }}
     - name: Package Helm chart
       run: |
