@@ -25,8 +25,7 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     - name: Set Azure subscription and ACR login
       uses: azure/CLI@v1
-      with:
-        azcliversion: 2.0.72
+      with:        
         inlineScript: |
           az account set -s ${{ secrets.AZURE_SUBSCRIPTION }}  
           az acr login -n ${{ secrets.ACR_NAME }}
