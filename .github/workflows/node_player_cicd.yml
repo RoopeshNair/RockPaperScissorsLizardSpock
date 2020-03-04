@@ -10,7 +10,6 @@ on:
       - Deploy/helm/dotnet-player/**
     branches:
       - master    
-
 jobs:
   buildpush:
     runs-on: ubuntu-16.04
