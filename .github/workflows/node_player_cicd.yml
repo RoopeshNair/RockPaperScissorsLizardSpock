@@ -23,12 +23,15 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-    - name: Set Azure subscription
-      run: |
-        az account set -s ${{ secrets.AZURE_SUBSCRIPTION }}
+    - name: Set Azure subscription and ACR login
+      uses: azure/CLI@v1
+      with:
+        azcliversion: 2.0.72
+        inlineScript: |
+          az account set -s ${{ secrets.AZURE_SUBSCRIPTION }}  
+          az acr login -n ${{ secrets.ACR_NAME }}
     - name: Docker push
-      run: |
-        az acr login -n ${{ secrets.ACR_NAME }}
+      run: |        
         docker push ${{ secrets.ACR_NAME }}.azurecr.io/node.player:gh-${{ github.sha }}
     - name: Set AKS kubectl context
       uses: azure/aks-set-context@v1
@@ -40,23 +43,26 @@ jobs:
       uses: azure/setup-helm@v1
       with:
         version: latest
-      id: install        
+      id: install  
     - name: Helm repo add
-      run: |
-        #curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 > get_helm.sh
-        #chmod 700 get_helm.sh
-        #./get_helm.sh
-        az acr helm repo add -n ${{ secrets.ACR_NAME }}
+      uses: azure/CLI@v1
+      with:
+        azcliversion: 2.0.72
+        inlineScript: |
+          az acr helm repo add -n ${{ secrets.ACR_NAME }}           
     - name: Package Helm chart
       run: |
         helm package  Deploy/helm/node-player -d Deploy/helm/__charts --version 1.0.0-${{ github.sha }}
     - name: Upload chart to ACR
-      run: |
-        az acr helm push Deploy/helm/__charts/node-player-1.0.0-${{ github.sha }}.tgz -n ${{ secrets.ACR_NAME }}
+      uses: azure/CLI@v1
+      with:
+        azcliversion: 2.0.72
+        inlineScript: |
+          az acr helm push Deploy/helm/__charts/node-player-1.0.0-${{ github.sha }}.tgz -n ${{ secrets.ACR_NAME }}  
+          az extension add --name application-insights
     - name: Generate config file
       shell: pwsh
-      run: |
-        az extension add --name application-insights
+      run: |        
         Deploy/powershell/Generate-Config.ps1 -gvaluesTemplate gvalues.template.gh -resourceGroup ${{ secrets.RESOURCE_GROUP }} -outputFile _values-gh.yaml -aksHost ${{ secrets.AKS_HOST }} -resourceGroupAcr ${{ secrets.RESOURCE_GROUP_ACR }}
     - name: Install Helm Chart
       run: |
