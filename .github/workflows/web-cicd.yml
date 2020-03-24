@@ -56,6 +56,7 @@ jobs:
         az acr helm repo add -n ${{ secrets.ACR_NAME }}
     - name: Package Helm chart
       run: |
+        helm init -c
         helm package  Deploy/helm/web -d Deploy/helm/__charts --version 1.0.0-${{ github.sha }} 
     - name: Upload chart to ACR
       run: |
