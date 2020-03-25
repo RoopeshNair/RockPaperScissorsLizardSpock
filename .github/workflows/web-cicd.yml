@@ -14,7 +14,7 @@ on:
   
   schedule:
     #  runs at minute 0 of the 4th, 5th, and 6th hour.
-    - cron:  '0 6 * * *'
+    - cron:  '0 4-6 * * *'
           
 
 jobs:
