@@ -10,12 +10,7 @@ on:
     - Source/Services/RPSLS.ModelUploader.Web/**
     - Deploy/helm/web/**
     branches:
-      - master    
-  
-  schedule:
-    #  runs at minute 0 of the 4th, 5th, and 6th hour.
-    - cron:  '0 4-6 * * *'
-          
+      - master     
 
 jobs:
   buildpush:
