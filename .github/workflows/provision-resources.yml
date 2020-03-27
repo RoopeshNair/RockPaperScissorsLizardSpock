@@ -1,0 +1,23 @@
+name: provision
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on: 
+  push:
+    paths:
+    - Deploy/arm/**
+    - .github/workflows/provision-resources.yml
+    branches:
+      - master 
+
+jobs:
+  provision:
+    runs-on: ubuntu-16.04
+    steps:
+    - uses: actions/checkout@v2
+
+    # Runs a set of commands using the runners shell
+    - name: Run a multi-line script
+      run: |
+        echo Add other actions to build,
+        echo test, and deploy your project.
