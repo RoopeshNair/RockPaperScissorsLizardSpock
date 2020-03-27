@@ -26,5 +26,5 @@ jobs:
     # Provions resources using arm templates
     - name: provision Azure resources
       run: |
-        Deploy/powershell/Deploy-Arm-Azure.ps1 -resourceGroup rpsls265 -clientId ${{ secrets.AZURE_CLIENT_ID }} -password ${{ secrets.AZURE_CLIENT_PWD }} -location westcentralus
+        Deploy/powershell/Deploy-Arm-Azure.ps1 -resourceGroup rpslsqa -clientId ${{ secrets.AZURE_CLIENT_ID }} -password ${{ secrets.AZURE_CLIENT_PWD }} -location westcentralus
    
