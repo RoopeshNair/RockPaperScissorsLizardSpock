@@ -31,12 +31,17 @@ jobs:
         $funcSvcPlanTier="Dynamic"
        
         Write-Host "Begining the ARM deployment..." -ForegroundColor Yellow
+        
         az account set -s ${{ secrets.AZURE_SUBSCRIPTION }}
+        
         $objectId = $(az ad sp show --id $clientId --query "objectId" -o tsv)
+        
         $rg = $(az group create -n $resourceGroup -l $location -o json | ConvertFrom-Json)
         $location = $rg.location
+        
         $aksVersions=$(az aks get-versions -l $location --query  orchestrators[].orchestratorVersion -o json | ConvertFrom-Json)
         $aksVersion=$aksVersions[$aksVersions.Length-1]
+        
         Write-Host "Parameters Location: $location, AKS version: $aksVersion, objectId: $objectId. Will use that" -ForegroundColor Yellow
 
         az group deployment create -g $resourceGroup --template-file "Deploy/arm/deployment.json" --parameters servicePrincipalId=$clientId --parameters servicePrincipalSecret=$password --parameters aksVersion=$aksVersion --parameters kv_objectId=$objectId --parameters funcAppSkuName=$funcSvcPlan --parameters funcAppSkuTier=$funcSvcPlanTier
