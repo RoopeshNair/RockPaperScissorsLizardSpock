@@ -29,29 +29,25 @@ jobs:
         PWD: ${{ secrets.AZURE_CLIENT_PWD }}
         FUNC_SVC_PLAN: Y1
         FUNC_SVC_TIER: Dynamic
-      run: |
-        $resourceGroup=$RG_NAME
-        $clientId=$CLIENT_ID
-        $password=$PWD
-        $funcSvcPlan=$FUNC_SVC_PLAN
-        $funcSvcPlanTier=$FUNC_SVC_TIER
-       
+        LOCATION: westus2
+        AZURE_SUB: ${{ secrets.AZURE_SUBSCRIPTION }}
+      run: |   
         Write-Host "Begining the ARM deployment..." -ForegroundColor Yellow
         
-        az account set -s ${{ secrets.AZURE_SUBSCRIPTION }}
+        az account set -s $AZURE_SUB
         
-        $objectId = $(az ad sp show --id $clientId --query "objectId" -o tsv)
+        $objectId = $(az ad sp show --id $CLIENT_ID --query "objectId" -o tsv)
         Write-Host $objectId
         
-        $rg = $(az group create -n $resourceGroup -l $location -o json | ConvertFrom-Json)
+        $rg = $(az group create -n $RG_NAME -l $LOCATION -o json | ConvertFrom-Json)
         $location = $rg.location
         Write-Host $location
         
-        $aksVersions=$(az aks get-versions -l $location --query  orchestrators[].orchestratorVersion -o json | ConvertFrom-Json)
+        $aksVersions=$(az aks get-versions -l $LOCATION --query  orchestrators[].orchestratorVersion -o json | ConvertFrom-Json)
         $aksVersion=$aksVersions[$aksVersions.Length-1]
         Write-Host $aksVersion
         
-        az group deployment create -g $resourceGroup --template-file "Deploy/arm/deployment.json" --parameters servicePrincipalId=$clientId --parameters servicePrincipalSecret=$password --parameters aksVersion=$aksVersion --parameters kv_objectId=$objectId --parameters funcAppSkuName=$funcSvcPlan --parameters funcAppSkuTier=$funcSvcPlanTier
+        az group deployment create -g $RG_NAME --template-file "Deploy/arm/deployment.json" --parameters servicePrincipalId=$CLIENT_ID --parameters servicePrincipalSecret=$PWD --parameters aksVersion=$aksVersion --parameters kv_objectId=$objectId --parameters funcAppSkuName=$FUNC_SVC_PLAN --parameters funcAppSkuTier=$FUNC_SVC_TIER
         
         exit $LastExitCode
         
