@@ -23,25 +23,15 @@ jobs:
 
     # Provions resources using arm template
     - name: provision Azure resources
-      env:
-        RG_NAME: "rpslsuat"
-        CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-        PWD: ${{ secrets.AZURE_CLIENT_PWD }}
-        FUNC_SVC_PLAN: Y1
-        FUNC_SVC_TIER: Dynamic
-        LOCATION: westus2
-        AZURE_SUB: ${{ secrets.AZURE_SUBSCRIPTION }}
       run: |   
         Write-Host "Begining the ARM deployment..." -ForegroundColor Yellow
-        Write-Host $CLIENT_ID $RG_NAME $PWD $FUNC_SVC_PLAN $FUNC_SVC_TIER $LOCATION $AZURE_SUB
-        Write-Host ${{ secrets.AZURE_SUBSCRIPTION }}
         
         az account set -s ${{ secrets.AZURE_SUBSCRIPTION }}
         
-        $objectId = $(az ad sp show --id $CLIENT_ID --query "objectId" -o tsv)
+        $objectId = $(az ad sp show --id ${{ secrets.AZURE_CLIENT_ID }} --query "objectId" -o tsv)
         Write-Host $objectId
         
-        $rg = $(az group create -n $RG_NAME -l $LOCATION -o json | ConvertFrom-Json)
+        $rg = $(az group create -n rpslsuat -l westus2 -o json | ConvertFrom-Json)
         $location = $rg.location
         Write-Host $location
         
@@ -49,7 +39,7 @@ jobs:
         $aksVersion=$aksVersions[$aksVersions.Length-1]
         Write-Host $aksVersion
         
-        az group deployment create -g $RG_NAME --template-file "Deploy/arm/deployment.json" --parameters servicePrincipalId=$CLIENT_ID --parameters servicePrincipalSecret=$PWD --parameters aksVersion=$aksVersion --parameters kv_objectId=$objectId --parameters funcAppSkuName=$FUNC_SVC_PLAN --parameters funcAppSkuTier=$FUNC_SVC_TIER
+        az group deployment create -g rpslsuat --template-file "Deploy/arm/deployment.json" --parameters servicePrincipalId=${{ secrets.AZURE_CLIENT_ID }} --parameters servicePrincipalSecret=${{ secrets.AZURE_CLIENT_PWD }} --parameters aksVersion=$aksVersion --parameters kv_objectId=$objectId --parameters funcAppSkuName="Y1" --parameters funcAppSkuTier="Dynamic"
         
         exit $LastExitCode
         
