@@ -20,10 +20,10 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-    # Provions resources using arm template
+    # Provisions resources using ARM template
     - name: Provision Azure resources
       run: |   
-        Write-Host "Begining the ARM deployment..." -ForegroundColor Yellow        
+        Write-Host "Begining the ARM deployment..."      
         az account set -s ${{ secrets.AZURE_SUBSCRIPTION }}              
         az group deployment create -g rpslsuat --template-file "Deploy/arm/deployment.json" --parameters servicePrincipalId=${{ secrets.AZURE_CLIENT_ID }} --parameters servicePrincipalSecret=${{ secrets.AZURE_CLIENT_PWD }} --parameters aksVersion="1.17.3" --parameters kv_objectId="b4e21852-bf98-41cd-b2fe-136466e0b4f1" --parameters funcAppSkuName="Y1" --parameters funcAppSkuTier="Dynamic"
         exit $LastExitCode
