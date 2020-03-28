@@ -28,8 +28,9 @@ jobs:
       run: |
         $resourceGroup="rpslsuat"
         Write-Host "Begining the ARM deployment..." -ForegroundColor Yellow
-  
-        az group deployment create -g $resourceGroup --template-file "Deploy/arm/deployment.json" --parameters servicePrincipalId=${{ secrets.AZURE_CLIENT_ID }} --parameters servicePrincipalSecret=${{ secrets.AZURE_CLIENT_PWD }}  
+        $objectId = $(az ad sp show --id $clientId --query "objectId" -o tsv)
+        
+        az group deployment create -g $resourceGroup --template-file "Deploy/arm/deployment.json" --parameters servicePrincipalId=${{ secrets.AZURE_CLIENT_ID }} --parameters servicePrincipalSecret=${{ secrets.AZURE_CLIENT_PWD }} --parameters kv_objectId=$objectId 
 
         exit $LastExitCode
         
