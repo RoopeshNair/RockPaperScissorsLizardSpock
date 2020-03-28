@@ -23,12 +23,18 @@ jobs:
 
     # Provions resources using arm template
     - name: provision Azure resources
+      env:
+        RG_NAME: "rpslsuat"
+        CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        PWD: ${{ secrets.AZURE_CLIENT_PWD }}
+        FUNC_SVC_PLAN: Y1
+        FUNC_SVC_TIER: Dynamic
       run: |
-        $resourceGroup="rpslsuat"
-        $clientId=${{ secrets.AZURE_CLIENT_ID }}
-        $password=${{ secrets.AZURE_CLIENT_PWD }}
-        $funcSvcPlan="Y1"
-        $funcSvcPlanTier="Dynamic"
+        $resourceGroup=$RG_NAME
+        $clientId=$CLIENT_ID
+        $password=$PWD
+        $funcSvcPlan=$FUNC_SVC_PLAN
+        $funcSvcPlanTier=$FUNC_SVC_TIER
        
         Write-Host "Begining the ARM deployment..." -ForegroundColor Yellow
         
@@ -50,7 +56,7 @@ jobs:
         exit $LastExitCode
         
         # Deploy/powershell/Deploy-Arm-Azure.ps1 -resourceGroup rpslsuat -clientId ${{ secrets.AZURE_CLIENT_ID }} -password ${{ secrets.AZURE_CLIENT_PWD }} -location westus2
-     
-      shell: powershell
+
+
 
    
