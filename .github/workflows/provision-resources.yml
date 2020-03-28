@@ -50,7 +50,7 @@ jobs:
         exit $LastExitCode
         
         # Deploy/powershell/Deploy-Arm-Azure.ps1 -resourceGroup rpslsuat -clientId ${{ secrets.AZURE_CLIENT_ID }} -password ${{ secrets.AZURE_CLIENT_PWD }} -location westus2
-   
-
+     
+      shell: powershell
 
    
