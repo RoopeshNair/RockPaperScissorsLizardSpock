@@ -20,27 +20,18 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-
     # Provions resources using arm template
-    - name: provision Azure resources
+    - name: Provision Azure resources
       run: |   
-        Write-Host "Begining the ARM deployment..." -ForegroundColor Yellow
-        
-        az account set -s ${{ secrets.AZURE_SUBSCRIPTION }}
-        
-        $objectId = $(az ad sp show --id ${{ secrets.AZURE_CLIENT_ID }} --query "objectId" -o tsv)
-        Write-Host $objectId
-        
+        Write-Host "Begining the ARM deployment..." -ForegroundColor Yellow        
+        az account set -s ${{ secrets.AZURE_SUBSCRIPTION }}      
+        $objectId = $(az ad sp show --id ${{ secrets.AZURE_CLIENT_ID }} --query "objectId" -o tsv)     
         $rg = $(az group create -n rpslsuat -l westus2 -o json | ConvertFrom-Json)
         $location = $rg.location
-        Write-Host $location
-        
         $aksVersions=$(az aks get-versions -l $LOCATION --query  orchestrators[].orchestratorVersion -o json | ConvertFrom-Json)
         $aksVersion=$aksVersions[$aksVersions.Length-1]
-        Write-Host $aksVersion
         
         az group deployment create -g rpslsuat --template-file "Deploy/arm/deployment.json" --parameters servicePrincipalId=${{ secrets.AZURE_CLIENT_ID }} --parameters servicePrincipalSecret=${{ secrets.AZURE_CLIENT_PWD }} --parameters aksVersion=$aksVersion --parameters kv_objectId=$objectId --parameters funcAppSkuName="Y1" --parameters funcAppSkuTier="Dynamic"
-        
         exit $LastExitCode
         
         # Deploy/powershell/Deploy-Arm-Azure.ps1 -resourceGroup rpslsuat -clientId ${{ secrets.AZURE_CLIENT_ID }} -password ${{ secrets.AZURE_CLIENT_PWD }} -location westus2
