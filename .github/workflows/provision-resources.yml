@@ -33,6 +33,7 @@ jobs:
         AZURE_SUB: ${{ secrets.AZURE_SUBSCRIPTION }}
       run: |   
         Write-Host "Begining the ARM deployment..." -ForegroundColor Yellow
+        Write-Host $CLIENT_ID $RG_NAME $PWD $FUNC_SVC_PLAN $FUNC_SVC_TIER $LOCATION $AZURE_SUB
         
         az account set -s $AZURE_SUB
         
