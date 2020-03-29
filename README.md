@@ -1,5 +1,5 @@
 ---
-page_type: sample
+page_type: sample app
 name: "Rock, Paper, Scissors, Lizard, Spock"
 urlFragment: azure-rock-paper-scissors
 description: "Rock, Paper, Scissors, Lizard, Spock is the geek version of the classic Rock, Paper, Scissors game."
