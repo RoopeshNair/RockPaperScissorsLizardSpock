@@ -1,0 +1,30 @@
+# Node Player Workflow
+
+name: predictorFunction
+
+on: 
+  push:
+    paths:
+    - Source/Functions/
+    - .github/workflows/predictor_function_cicd.yml    
+#    - Deploy/helm/node-player/**
+    branches:
+      - master    
+
+jobs:
+  buildpush:
+    runs-on: ubuntu-16.04
+    steps:
+    - uses: actions/checkout@v1  
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    - name: Set Azure subscription
+      run: |
+        az account set -s ${{ secrets.AZURE_SUBSCRIPTION }}
+    - uses: Azure/functions-action@v1
+      id: fa
+      with:
+        app-name: rpslsfuncappe6zgucludkrny
+        package: 'Source/Functions/RPSLS.Python.Api'
